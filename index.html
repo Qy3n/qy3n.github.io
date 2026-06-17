@@ -3,32 +3,134 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>主指引站 — 我的小游戏集合</title>
-  <link rel="stylesheet" href="./style.css">
+  <title>全部小游戏</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .section{margin-bottom:28px}
+    .tabs{display:flex;gap:8px;margin-bottom:12px}
+    .hidden{display:none}
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>主指引站</h1>
-    <p class="small">欢迎！这是主站，包含两个小游戏子站的链接与说明。</p>
+    <h1>全部小游戏（整合页）</h1>
+    <p class="small">通过上方标签在三个游戏间切换，页面将保持在同一 HTML 文件内。</p>
 
-    <div class="nav">
-      <a class="link-btn" href="game1.html" target="_blank">打开 游戏 1：点击计时</a>
-      <a class="link-btn" href="game2.html" target="_blank">打开 游戏 2：猜数字</a>
-      <a class="link-btn" href="game3.html" target="_blank">打开 游戏 3：24点</a>
+    <div class="tabs">
+      <button id="tab1" class="link-btn">游戏1：点击计时</button>
+      <button id="tab2" class="link-btn">游戏2：猜数字</button>
+      <button id="tab3" class="link-btn">游戏3：24点</button>
+      <a href="index.html" class="link-btn" style="background:#6a737d">返回主站</a>
     </div>
 
-    <div class="card">
-      <h2>关于两个子站</h2>
-      <ul>
-        <li><strong>游戏 1（点击计时）</strong>：规定时间内尽可能多点击按钮，记录成绩。</li>
-        <li><strong>游戏 2（猜数字）</strong>：在最少次数内猜出随机数字，页面给出提示（大/小）。</li>
-      </ul>
+    <!-- 游戏 1 -->
+    <div id="sec1" class="section">
+      <h2>小游戏 1：点击计时</h2>
+      <div class="card center">
+        <p>目标：在 <strong id="ct_timeTarget">10</strong> 秒内尽可能多点击按钮。</p>
+        <p>剩余时间： <span id="ct_timeLeft">10</span>s</p>
+        <p>得分： <span id="ct_score">0</span></p>
+      </div>
+      <div style="margin-top:10px">
+        <button id="ct_clickBtn" class="link-btn">点击我</button>
+        <button id="ct_startBtn" class="link-btn">开始</button>
+      </div>
     </div>
 
-    <div class="card" style="margin-top:12px">
-      <h3>本地运行</h3>
-      <p class="small">直接打开此文件或者使用轻量服务器（例如 `python -m http.server`）预览。</p>
+    <!-- 游戏 2 -->
+    <div id="sec2" class="section hidden">
+      <h2>小游戏 2：猜数字</h2>
+      <div class="card center">
+        <p>我选择了一个 1 到 50 的整数，你来猜，页面会提示“太大”或“太小”。</p>
+        <p class="small">尝试次数：<span id="gn_tries">0</span></p>
+        <p id="gn_hint" class="small"></p>
+      </div>
+      <div style="margin-top:10px">
+        <input id="gn_guessInput" type="number" min="1" max="50" placeholder="输入 1-50 的数字">
+        <div style="margin-top:8px">
+          <button id="gn_guessBtn" class="link-btn">提交猜测</button>
+          <button id="gn_newBtn" class="link-btn" style="background:#6a737d">重新开始</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏 3 -->
+    <div id="sec3" class="section hidden">
+      <h2>小游戏 3：24点</h2>
+      <div class="card center">
+        <p>规则：使用四个数字和 + - * / 及括号，算出 24。每个数字须使用一次。</p>
+      </div>
+      <div class="cards" id="tp_cards" style="margin-top:10px"></div>
+      <div style="margin-top:8px">
+        <button id="tp_newBtn" class="link-btn">生成新题</button>
+        <button id="tp_solveBtn" class="link-btn" style="background:#28a745">给出解法</button>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <p>输入你的表达式（例如：(3+3)*(4+0)）：</p>
+        <input id="tp_expr" type="text" placeholder="输入表达式并按检查">
+        <div style="margin-top:8px">
+          <button id="tp_checkBtn" class="link-btn">检查</button>
+        </div>
+        <p id="tp_result" class="small"></p>
+      </div>
     </div>
   </div>
+
+  <script>
+    // 标签切换逻辑
+    const tab1 = document.getElementById('tab1');
+    const tab2 = document.getElementById('tab2');
+    const tab3 = document.getElementById('tab3');
+    const sec1 = document.getElementById('sec1');
+    const sec2 = document.getElementById('sec2');
+    const sec3 = document.getElementById('sec3');
+    function show(n){ sec1.classList.add('hidden'); sec2.classList.add('hidden'); sec3.classList.add('hidden'); if(n===1) sec1.classList.remove('hidden'); if(n===2) sec2.classList.remove('hidden'); if(n===3) sec3.classList.remove('hidden'); }
+    tab1.addEventListener('click', ()=>show(1));
+    tab2.addEventListener('click', ()=>show(2));
+    tab3.addEventListener('click', ()=>show(3));
+
+    // --- 游戏1：点击计时（命名空间 ct_）
+    const ct_timeTarget = document.getElementById('ct_timeTarget');
+    const ct_timeLeft = document.getElementById('ct_timeLeft');
+    const ct_score = document.getElementById('ct_score');
+    const ct_clickBtn = document.getElementById('ct_clickBtn');
+    const ct_startBtn = document.getElementById('ct_startBtn');
+    let ct_timeLimit = 10, ct_time=ct_timeLimit, ct_scoreVal=0, ct_timer=null;
+    ct_timeTarget.textContent = ct_timeLimit;
+    function ct_reset(){ ct_time=ct_timeLimit; ct_scoreVal=0; ct_timeLeft.textContent=ct_time; ct_score.textContent=ct_scoreVal; clearInterval(ct_timer); }
+    ct_clickBtn.addEventListener('click', ()=>{ if(ct_time>0){ ct_scoreVal++; ct_score.textContent=ct_scoreVal; }});
+    ct_startBtn.addEventListener('click', ()=>{ ct_reset(); ct_timer = setInterval(()=>{ ct_time--; ct_timeLeft.textContent=ct_time; if(ct_time<=0){ clearInterval(ct_timer); alert('时间到！得分：'+ct_scoreVal); } },1000); });
+
+    // --- 游戏2：猜数字（命名空间 gn_）
+    const gn_guessInput = document.getElementById('gn_guessInput');
+    const gn_guessBtn = document.getElementById('gn_guessBtn');
+    const gn_newBtn = document.getElementById('gn_newBtn');
+    const gn_hint = document.getElementById('gn_hint');
+    const gn_tries = document.getElementById('gn_tries');
+    let gn_secret=0, gn_tryCount=0;
+    function gn_newGame(){ gn_secret = Math.floor(Math.random()*50)+1; gn_tryCount=0; gn_tries.textContent=gn_tryCount; gn_hint.textContent=''; gn_guessInput.value=''; }
+    gn_newBtn.addEventListener('click', gn_newGame);
+    gn_guessBtn.addEventListener('click', ()=>{ const v = Number(gn_guessInput.value); if(!v || v<1 || v>50){ alert('请输入 1 到 50 之间的整数'); return; } gn_tryCount++; gn_tries.textContent=gn_tryCount; if(v===gn_secret){ gn_hint.textContent='恭喜，你猜对了！用时 '+gn_tryCount+' 次。'; } else if(v>gn_secret){ gn_hint.textContent='太大了'; } else { gn_hint.textContent='太小了'; } });
+    gn_newGame();
+
+    // --- 游戏3：24点（命名空间 tp_）
+    const tp_cards = document.getElementById('tp_cards');
+    const tp_newBtn = document.getElementById('tp_newBtn');
+    const tp_solveBtn = document.getElementById('tp_solveBtn');
+    const tp_checkBtn = document.getElementById('tp_checkBtn');
+    const tp_expr = document.getElementById('tp_expr');
+    const tp_result = document.getElementById('tp_result');
+    let tp_nums = [];
+    function tp_rand(){ tp_nums=[]; for(let i=0;i<4;i++) tp_nums.push(Math.floor(Math.random()*13)+1); tp_render(); tp_result.textContent=''; tp_expr.value=''; }
+    function tp_render(){ tp_cards.innerHTML=''; tp_nums.forEach(n=>{ const d=document.createElement('div'); d.className='card-item'; d.textContent=n; tp_cards.appendChild(d); }); }
+    function tp_solve(arr){ const eps=1e-6; function helperExpr(numsVals, numsExpr){ if(numsVals.length===1){ if(Math.abs(numsVals[0]-24)<1e-6) return numsExpr[0]; else return null; } for(let i=0;i<numsVals.length;i++){ for(let j=0;j<numsVals.length;j++){ if(i===j) continue; const a=numsVals[i], b=numsVals[j]; const exprA=numsExpr[i], exprB=numsExpr[j]; const nextVals=[]; const nextExpr=[]; for(let k=0;k<numsVals.length;k++) if(k!==i && k!==j){ nextVals.push(numsVals[k]); nextExpr.push(numsExpr[k]); } const candidates=[['('+exprA+'+'+exprB+')',a+b],['('+exprA+'-'+exprB+')',a-b],['('+exprA+'*'+exprB+')',a*b]]; if(Math.abs(b)>1e-9) candidates.push(['('+exprA+'/'+exprB+')',a/b]); for(const [e,v] of candidates){ nextVals.push(v); nextExpr.push(e); const r=helperExpr(nextVals,nextExpr); if(r) return r; nextVals.pop(); nextExpr.pop(); } } } return null; } const vals=arr.slice(); const exprs=arr.map(x=>''+x); return helperExpr(vals,exprs); }
+    tp_newBtn.addEventListener('click', tp_rand);
+    tp_checkBtn.addEventListener('click', ()=>{ const s=tp_expr.value.trim(); if(!s){ tp_result.textContent='请输入表达式。'; return; } if(/[^0-9\s\+\-\*\/\(\)]/.test(s)){ tp_result.textContent='表达式含非法字符。'; return; } try{ const numsUsed=s.match(/\d+/g)||[]; const provided=tp_nums.slice().map(String).sort(); if(numsUsed.length!==4 || numsUsed.map(String).sort().join(',')!==provided.join(',')){ tp_result.textContent='请使用且仅使用显示的四个数字各一次。'; return; } const val=eval(s); if(Math.abs(val-24)<1e-6) tp_result.textContent='恭喜，正确！'; else tp_result.textContent='不等于 24，结果：'+val; }catch(e){ tp_result.textContent='表达式计算出错。'; } });
+    tp_solveBtn.addEventListener('click', ()=>{ const sol=tp_solve(tp_nums); if(sol) tp_result.textContent='找到解法： '+sol; else tp_result.textContent='未找到解法。'; });
+    tp_rand();
+
+    // 默认显示第1个
+    show(1);
+  </script>
 </body>
 </html>
