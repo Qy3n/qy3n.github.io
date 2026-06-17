@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>游戏 1 — 点击计时</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>.game-area{display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px}</style>
+</head>
+<body>
+  <div class="container">
+    <h1>小游戏 1：点击计时</h1>
+    <div class="game-area">
+      <div class="card center">
+        <p>目标：在 <strong id="timeTarget">10</strong> 秒内尽可能多点击按钮。</p>
+        <p>剩余时间： <span id="timeLeft">10</span>s</p>
+        <p>得分： <span id="score">0</span></p>
+      </div>
+
+      <button id="clickBtn" class="link-btn">点击我</button>
+      <div>
+        <button id="startBtn" class="link-btn">开始</button>
+        <a href="../index.html" class="link-btn" style="background:#6a737d">返回主站</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const timeTargetEl = document.getElementById('timeTarget');
+    const timeLeftEl = document.getElementById('timeLeft');
+    const scoreEl = document.getElementById('score');
+    const clickBtn = document.getElementById('clickBtn');
+    const startBtn = document.getElementById('startBtn');
+
+    let timeLimit = 10; // 秒
+    let timeLeft = timeLimit;
+    let score = 0;
+    let timer = null;
+
+    timeTargetEl.textContent = timeLimit;
+    function reset(){ timeLeft = timeLimit; score=0; timeLeftEl.textContent=timeLeft; scoreEl.textContent=score; clearInterval(timer); }
+
+    clickBtn.addEventListener('click', ()=>{ if(timeLeft>0){ score++; scoreEl.textContent=score; }});
+
+    startBtn.addEventListener('click', ()=>{
+      reset();
+      timer = setInterval(()=>{
+        timeLeft--; timeLeftEl.textContent = timeLeft;
+        if(timeLeft<=0){ clearInterval(timer); alert('时间到！得分：'+score); }
+      },1000);
+    });
+  </script>
+</body>
+</html>

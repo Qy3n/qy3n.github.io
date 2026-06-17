@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>游戏 2 — 猜数字</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>.game-area{display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px}</style>
+</head>
+<body>
+  <div class="container">
+    <h1>小游戏 2：猜数字</h1>
+    <div class="game-area">
+      <div class="card center">
+        <p>我选择了一个 1 到 50 的整数，你来猜，页面会提示“太大”或“太小”。</p>
+        <p class="small">尝试次数：<span id="tries">0</span></p>
+        <p id="hint" class="small"></p>
+      </div>
+
+      <input id="guessInput" type="number" min="1" max="50" placeholder="输入 1-50 的数字">
+      <div>
+        <button id="guessBtn" class="link-btn">提交猜测</button>
+        <button id="newBtn" class="link-btn" style="background:#6a737d">重新开始</button>
+        <a href="../index.html" class="link-btn" style="background:#999">返回主站</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const guessInput = document.getElementById('guessInput');
+    const guessBtn = document.getElementById('guessBtn');
+    const newBtn = document.getElementById('newBtn');
+    const hintEl = document.getElementById('hint');
+    const triesEl = document.getElementById('tries');
+
+    let secret = 0; let tries = 0;
+    function newGame(){ secret = Math.floor(Math.random()*50)+1; tries=0; triesEl.textContent=tries; hintEl.textContent=''; guessInput.value=''; }
+    newGame();
+
+    guessBtn.addEventListener('click', ()=>{
+      const v = Number(guessInput.value);
+      if(!v || v<1 || v>50){ alert('请输入 1 到 50 之间的整数'); return; }
+      tries++; triesEl.textContent=tries;
+      if(v===secret){ hintEl.textContent = '恭喜，你猜对了！用时 '+tries+' 次。'; }
+      else if(v>secret){ hintEl.textContent = '太大了'; }
+      else { hintEl.textContent = '太小了'; }
+    });
+
+    newBtn.addEventListener('click', newGame);
+  </script>
+</body>
+</html>

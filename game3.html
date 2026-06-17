@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>游戏 3 — 24点</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .game-area{display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px}
+    .cards{display:flex;gap:10px}
+    .card-item{padding:12px 16px;border-radius:6px;background:#fff;border:1px solid #e6e9ee}
+    input[type=text]{width:320px;padding:8px;border-radius:6px;border:1px solid #ddd}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>小游戏 3：24点</h1>
+    <div class="game-area">
+      <div class="card center">
+        <p>规则：使用四个数字和 + - * / 及括号，算出 24。每个数字须使用一次。</p>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div>
+        <button id="newBtn" class="link-btn">生成新题</button>
+        <button id="solveBtn" class="link-btn" style="background:#28a745">给出解法</button>
+        <a href="../index.html" class="link-btn" style="background:#6a737d">返回主站</a>
+      </div>
+
+      <div class="card">
+        <p>输入你的表达式（例如：(3+3)*(4+0)）：</p>
+        <input id="expr" type="text" placeholder="输入表达式并按检查">
+        <div style="margin-top:8px">
+          <button id="checkBtn" class="link-btn">检查</button>
+        </div>
+        <p id="result" class="small"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 生成四个随机数字（1-13）
+    const cardsEl = document.getElementById('cards');
+    const newBtn = document.getElementById('newBtn');
+    const solveBtn = document.getElementById('solveBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const exprInput = document.getElementById('expr');
+    const resultEl = document.getElementById('result');
+
+    let nums = [];
+
+    function randNums(){
+      nums = [];
+      for(let i=0;i<4;i++) nums.push(Math.floor(Math.random()*13)+1);
+      render();
+      resultEl.textContent=''; exprInput.value='';
+    }
+
+    function render(){
+      cardsEl.innerHTML = '';
+      nums.forEach(n=>{
+        const d = document.createElement('div'); d.className='card-item'; d.textContent=n; cardsEl.appendChild(d);
+      });
+    }
+
+    // 计算器：尝试穷举所有运算顺序和括号模板以求 24
+    function solve24(arr){
+      const eps = 1e-6;
+      const ops = ['+','-','*','/'];
+      function helperExpr(numsVals, numsExpr){
+        if(numsVals.length===1){
+          if(Math.abs(numsVals[0]-24)<1e-6) return numsExpr[0]; else return null;
+        }
+        for(let i=0;i<numsVals.length;i++){
+          for(let j=0;j<numsVals.length;j++){
+            if(i===j) continue;
+            const a = numsVals[i], b=numsVals[j];
+            const exprA = numsExpr[i], exprB = numsExpr[j];
+            const nextVals = [];
+            const nextExpr = [];
+            for(let k=0;k<numsVals.length;k++) if(k!==i && k!==j){ nextVals.push(numsVals[k]); nextExpr.push(numsExpr[k]); }
+
+            const candidates = [ ['('+exprA+'+'+exprB+')', a+b], ['('+exprA+'-'+exprB+')', a-b], ['('+exprA+'*'+exprB+')', a*b] ];
+            if(Math.abs(b) > 1e-9) candidates.push(['('+exprA+'/'+exprB+')', a/b]);
+
+            for(const [e, v] of candidates){
+              nextVals.push(v); nextExpr.push(e);
+              const r = helperExpr(nextVals, nextExpr);
+              if(r) return r;
+              nextVals.pop(); nextExpr.pop();
+            }
+          }
+        }
+        return null;
+      }
+
+      const vals = arr.slice();
+      const exprs = arr.map(x=>''+x);
+      return helperExpr(vals, exprs);
+    }
+
+    newBtn.addEventListener('click', randNums);
+
+    checkBtn.addEventListener('click', ()=>{
+      const s = exprInput.value.trim();
+      if(!s){ resultEl.textContent='请输入表达式。'; return; }
+      if(/[^0-9\s\+\-\*\/\(\)]/.test(s)){ resultEl.textContent='表达式含非法字符。'; return; }
+      try{
+        const numsUsed = s.match(/\d+/g) || [];
+        const provided = nums.slice().map(String).sort();
+        if(numsUsed.length!==4 || numsUsed.map(String).sort().join(',') !== provided.join(',')){
+          resultEl.textContent='请使用且仅使用显示的四个数字各一次。'; return;
+        }
+        const val = eval(s);
+        if(Math.abs(val-24) < 1e-6) resultEl.textContent='恭喜，正确！'; else resultEl.textContent='不等于 24，结果：'+val;
+      }catch(e){ resultEl.textContent='表达式计算出错。'; }
+    });
+
+    solveBtn.addEventListener('click', ()=>{
+      const sol = solve24(nums);
+      if(sol) resultEl.textContent = '找到解法： '+sol;
+      else resultEl.textContent = '未找到解法。';
+    });
+
+    randNums();
+  </script>
+</body>
+</html>
