@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>游戏 3 — 24点</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     .game-area{display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px}
     .cards{display:flex;gap:10px}
@@ -25,7 +25,7 @@
       <div>
         <button id="newBtn" class="link-btn">生成新题</button>
         <button id="solveBtn" class="link-btn" style="background:#28a745">给出解法</button>
-        <a href="../index.html" class="link-btn" style="background:#6a737d">返回主站</a>
+        <a href="index.html" class="link-btn" style="background:#6a737d">返回主站</a>
       </div>
 
       <div class="card">
@@ -64,10 +64,8 @@
       });
     }
 
-    // 计算器：尝试穷举所有运算顺序和括号模板以求 24
     function solve24(arr){
       const eps = 1e-6;
-      const ops = ['+','-','*','/'];
       function helperExpr(numsVals, numsExpr){
         if(numsVals.length===1){
           if(Math.abs(numsVals[0]-24)<1e-6) return numsExpr[0]; else return null;
